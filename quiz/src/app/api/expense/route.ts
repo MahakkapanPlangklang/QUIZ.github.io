@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import { MongoClient } from 'mongodb';
 
-const uri = 'mongodb+srv://phanuwatsa:qhmC2yJWT3OjcMyz@phanuwat.kqdaq.mongodb.net/'; // แทนที่ด้วย URL ของ MongoDB
+const uri = 'mongodb+srv://0907656068:0907656068@cluster0.u1vf7.mongodb.net/'; // แทนที่ด้วย URL ของ MongoDB
 const client = new MongoClient(uri);
 
 export async function POST(request: Request) {
