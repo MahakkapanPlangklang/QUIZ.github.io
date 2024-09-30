@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import axios from 'axios';
@@ -5,38 +7,36 @@ import axios from 'axios';
 interface Record {
     amount: number;
     date: string;
-    type: 'income' | 'expense'; 
+    type: 'income' | 'expense';
     note: string;
     id?: number;
 }
 
-const page = () => {
-    const [records, setRecords] = useState<Record[]>([]); 
+const Page = () => {
+    const [records, setRecords] = useState<Record[]>([]);
     const [amount, setAmount] = useState('');
     const [date, setDate] = useState('');
-    const [type, setType] = useState<'income' | 'expense'>('income'); 
+    const [type, setType] = useState<'income' | 'expense'>('income');
     const [note, setNote] = useState('');
     const [totalIncome, setTotalIncome] = useState(0);
     const [totalExpense, setTotalExpense] = useState(0);
-    
-    const API_URL = 'http://localhost:3000/records'; 
+
+    const API_URL = 'http://localhost:3000/records';
 
     const saveRecord = async () => {
-        const record: Record = { amount: Number(amount), date, type, note }; // ระบุประเภทให้กับ record
+        const record: Record = { amount: Number(amount), date, type, note };
         await axios.post(API_URL, record);
-        fetchRecords(); // โหลดรายการใหม่หลังบันทึก
+        fetchRecords();
     };
 
-    // ฟังก์ชันสำหรับดึงข้อมูลรายการจากฐานข้อมูล
     const fetchRecords = async () => {
         const response = await axios.get(API_URL);
-        const recordsData: Record[] = response.data; // ระบุประเภทให้กับ recordsData
+        const recordsData: Record[] = response.data;
         setRecords(recordsData);
         calculateTotals(recordsData);
     };
 
-    // ฟังก์ชันสำหรับคำนวณรวมรายรับและรายจ่าย
-    const calculateTotals = (data: Record[]) => { // ระบุประเภทให้กับ data
+    const calculateTotals = (data: Record[]) => {
         const income = data.filter(record => record.type === 'income').reduce((sum, record) => sum + record.amount, 0);
         const expense = data.filter(record => record.type === 'expense').reduce((sum, record) => sum + record.amount, 0);
         setTotalIncome(income);
@@ -44,10 +44,9 @@ const page = () => {
     };
 
     useEffect(() => {
-        fetchRecords(); // เรียกฟังก์ชันเมื่อคอมโพเนนต์โหลด
+        fetchRecords();
     }, []);
 
-    // ข้อมูลสำหรับกราฟ
     const chartData = {
         labels: records.map(record => record.date),
         datasets: [
@@ -93,4 +92,4 @@ const page = () => {
     );
 };
 
-export default page;
+export default Page;
