@@ -1,4 +1,5 @@
-"use client";
+// page.tsx
+"use client"; // ทำเครื่องหมายคอมโพเนนต์นี้เป็น Client Component
 
 import React, { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
@@ -12,6 +13,9 @@ interface Record {
     id?: number;
 }
 
+// เปลี่ยน URL นี้เป็น URL ที่ถูกต้องตามที่คุณใช้งาน
+const API_URL = 'https://quiz-flame-one.vercel.app/';
+
 const Page = () => {
     const [records, setRecords] = useState<Record[]>([]);
     const [amount, setAmount] = useState('');
@@ -21,19 +25,25 @@ const Page = () => {
     const [totalIncome, setTotalIncome] = useState(0);
     const [totalExpense, setTotalExpense] = useState(0);
 
-    const API_URL = 'http://localhost:3000/records';
-
     const saveRecord = async () => {
-        const record: Record = { amount: Number(amount), date, type, note };
-        await axios.post(API_URL, record);
-        fetchRecords();
+        try {
+            const record: Record = { amount: Number(amount), date, type, note };
+            await axios.post(API_URL, record);
+            fetchRecords();
+        } catch (error) {
+            console.error("Error saving record:", error);
+        }
     };
 
     const fetchRecords = async () => {
-        const response = await axios.get(API_URL);
-        const recordsData: Record[] = response.data;
-        setRecords(recordsData);
-        calculateTotals(recordsData);
+        try {
+            const response = await axios.get(API_URL);
+            const recordsData: Record[] = response.data;
+            setRecords(recordsData);
+            calculateTotals(recordsData);
+        } catch (error) {
+            console.error("Error fetching records:", error);
+        }
     };
 
     const calculateTotals = (data: Record[]) => {
