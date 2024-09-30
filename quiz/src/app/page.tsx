@@ -1,3 +1,5 @@
+"use client"; // ระบุว่าเป็น Client Component
+
 import React, { useEffect, useState } from 'react';
 import RecordForm from './components/RecordForm';
 import RecordList from './components/RecordList';
