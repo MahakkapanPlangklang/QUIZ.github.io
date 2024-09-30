@@ -1,27 +1,33 @@
-import { useEffect, useState } from "react";
-import RecordForm from "./components/RecordForm";
-import RecordList from "./components/RecordList";
-import connectDB from "./db";
+import React, { useEffect, useState } from 'react';
+import RecordForm from './components/RecordForm';
+import RecordList from './components/RecordList';
+import { Record } from './types/Record';
 
-export default function Home() {
-  const [records, setRecords] = useState([]);
+const Page: React.FC = () => {
+  const [records, setRecords] = useState<Record[]>([]);
+
+  // ฟังก์ชันเพื่อดึงข้อมูลบันทึก
+  const fetchRecords = async () => {
+    try {
+      const response = await fetch('/api/records');
+      const data: Record[] = await response.json();
+      setRecords(data);
+    } catch (error) {
+      console.error('Error fetching records:', error);
+    }
+  };
 
   useEffect(() => {
-    connectDB();
-    fetchRecords();
+    fetchRecords(); // เรียกใช้ฟังก์ชันเพื่อดึงข้อมูลเมื่อโหลดคอมโพเนนต์
   }, []);
-
-  const fetchRecords = async () => {
-    const response = await fetch('/api/records');
-    const data = await response.json();
-    setRecords(data);
-  };
 
   return (
     <div>
-      <h1>รายรับ-รายจ่าย</h1>
-      <RecordForm fetchRecords={fetchRecords} />
+      <h1>บันทึกรายรับรายจ่าย</h1>
+      <RecordForm fetchRecords={fetchRecords} /> {/* ส่งฟังก์ชันไปยัง RecordForm */}
       <RecordList records={records} />
     </div>
   );
-}
+};
+
+export default Page;
