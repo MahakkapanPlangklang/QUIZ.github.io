@@ -1,6 +1,6 @@
 "use client"; // ทำเครื่องหมายคอมโพเนนต์นี้เป็น Client Component
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Line } from 'react-chartjs-2';
 
 // ประเภทข้อมูลสำหรับบันทึกรายรับรายจ่าย
