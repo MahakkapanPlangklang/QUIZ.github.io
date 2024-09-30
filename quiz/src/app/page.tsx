@@ -1,35 +1,42 @@
-'use client';
+// src/app/page.tsx
 
-import { useEffect, useState } from 'react';
-import RecordForm from './components/RecordForm';
-import RecordList from './components/RecordList';
-import connectDB from './db';
+import React, { useEffect, useState } from 'react';
+import connectDB from './db'; // เชื่อมต่อ MongoDB
+import RecordForm from './components/RecordForm'; // นำเข้า RecordForm
+import RecordList from './components/RecordList'; // นำเข้า RecordList
+import { Record } from './types/Record'; // นำเข้า Type สำหรับ Record
 
-const Page = () => {
-  const [records, setRecords] = useState([]);
+const Page: React.FC = () => {
+  const [records, setRecords] = useState<Record[]>([]);
+  const [totalIncome, setTotalIncome] = useState<number>(0);
+  const [totalExpense, setTotalExpense] = useState<number>(0);
 
   useEffect(() => {
-    connectDB(); // เรียกใช้ฟังก์ชัน connectDB
-    fetchRecords(); // ถ้าคุณมีฟังก์ชันนี้อยู่
+    connectDB(); // เชื่อมต่อฐานข้อมูล
+    fetchRecords(); // ดึงข้อมูลรายรับรายจ่ายเมื่อ component ถูก mount
   }, []);
 
   const fetchRecords = async () => {
-    const response = await fetch('/api', {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    });
+    // ฟังก์ชันสำหรับดึงข้อมูลจากฐานข้อมูล
+    const response = await fetch('/api/records');
     const data = await response.json();
     setRecords(data);
+    calculateTotals(data); // คำนวณยอดรวม
   };
 
-  useEffect(() => {
-    fetchRecords();
-  }, []);
+  const calculateTotals = (data: Record[]) => {
+    const income = data.filter(record => record.type === 'income').reduce((acc, record) => acc + record.amount, 0);
+    const expense = data.filter(record => record.type === 'expense').reduce((acc, record) => acc + record.amount, 0);
+    setTotalIncome(income);
+    setTotalExpense(expense);
+  };
 
   return (
     <div>
-      <h1>Expense Tracker</h1>
+      <h1>บันทึกรายรับรายจ่าย</h1>
       <RecordForm fetchRecords={fetchRecords} />
+      <h2>ยอดรวมรายรับ: {totalIncome} บาท</h2>
+      <h2>ยอดรวมรายจ่าย: {totalExpense} บาท</h2>
       <RecordList records={records} />
     </div>
   );
