@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
-import axios from 'axios';
 
+// ประเภทข้อมูลสำหรับบันทึกรายรับรายจ่าย
 interface Record {
     amount: number;
     date: string;
@@ -12,41 +12,24 @@ interface Record {
     id?: number;
 }
 
-// เปลี่ยน URL นี้เป็น URL ที่ถูกต้องตามที่คุณใช้งาน
-const API_URL = 'https://quiz-flame-one.vercel.app/';
-
 const Page = () => {
-    const [records, setRecords] = useState<Record[]>([]);
-    const [amount, setAmount] = useState<string>('');
-    const [date, setDate] = useState<string>('');
-    const [type, setType] = useState<'income' | 'expense'>('income');
-    const [note, setNote] = useState<string>('');
-    const [totalIncome, setTotalIncome] = useState<number>(0);
-    const [totalExpense, setTotalExpense] = useState<number>(0);
+    const [records, setRecords] = useState<Record[]>([]); // รายการบันทึก
+    const [amount, setAmount] = useState<string>(''); // จำนวน
+    const [date, setDate] = useState<string>(''); // วันที่
+    const [type, setType] = useState<'income' | 'expense'>('income'); // ประเภท
+    const [note, setNote] = useState<string>(''); // โน้ต
+    const [totalIncome, setTotalIncome] = useState<number>(0); // รวมรายรับ
+    const [totalExpense, setTotalExpense] = useState<number>(0); // รวมรายจ่าย
 
-    const saveRecord = async () => {
-        try {
-            const record: Record = { amount: Number(amount), date, type, note };
-            await axios.post(API_URL, record);
-            fetchRecords();
-        } catch (error) {
-            console.error("Error saving record:", error);
-            alert("ไม่สามารถบันทึกข้อมูลได้");
-        }
+    // ฟังก์ชันบันทึกข้อมูลลงในสถานะ
+    const saveRecord = () => {
+        const newRecord: Record = { amount: Number(amount), date, type, note, id: records.length + 1 };
+        setRecords([...records, newRecord]); // อัปเดตรายการบันทึก
+        calculateTotals([...records, newRecord]); // คำนวณยอดรวมใหม่
+        resetForm(); // รีเซ็ตฟอร์มหลังบันทึก
     };
 
-    const fetchRecords = async () => {
-        try {
-            const response = await axios.get(API_URL);
-            const recordsData: Record[] = response.data;
-            setRecords(recordsData);
-            calculateTotals(recordsData);
-        } catch (error) {
-            console.error("Error fetching records:", error);
-            alert("ไม่สามารถดึงข้อมูลบันทึกได้");
-        }
-    };
-
+    // ฟังก์ชันคำนวณยอดรวมรายรับและรายจ่าย
     const calculateTotals = (data: Record[]) => {
         const income = data.filter(record => record.type === 'income').reduce((sum, record) => sum + record.amount, 0);
         const expense = data.filter(record => record.type === 'expense').reduce((sum, record) => sum + record.amount, 0);
@@ -54,10 +37,15 @@ const Page = () => {
         setTotalExpense(expense);
     };
 
-    useEffect(() => {
-        fetchRecords();
-    }, []);
+    // ฟังก์ชันรีเซ็ตฟอร์ม
+    const resetForm = () => {
+        setAmount('');
+        setDate('');
+        setType('income');
+        setNote('');
+    };
 
+    // ข้อมูลสำหรับกราฟ
     const chartData = {
         labels: records.map(record => record.date),
         datasets: [
