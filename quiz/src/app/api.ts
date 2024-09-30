@@ -1,24 +1,23 @@
 // src/app/api.ts
-import connectDB from './db'; // เชื่อมต่อ MongoDB
-import Record from './models/Record'; // นำเข้าโมเดล Record
+import connectDB from './db';
+import RecordModel, { Record } from './models/Record';
 import { NextApiRequest, NextApiResponse } from 'next';
 
+connectDB();
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  await connectDB(); // เชื่อมต่อกับฐานข้อมูล
-
   if (req.method === 'POST') {
+    const { name, description }: Record = req.body;
+
     try {
-      const { title, description } = req.body;
-
-      const newRecord = new Record({ title, description });
-      await newRecord.save(); // บันทึกข้อมูลในฐานข้อมูล
-
-      return res.status(201).json(newRecord); // ส่งกลับข้อมูลที่บันทึก
+      const newRecord = new RecordModel({ name, description });
+      await newRecord.save();
+      res.status(201).json(newRecord);
     } catch (error) {
-      console.error('Error saving record:', error);
-      return res.status(500).json({ message: 'Error saving record' });
+      res.status(500).json({ message: 'Error creating record', error });
     }
+  } else {
+    res.setHeader('Allow', ['POST']);
+    res.status(405).end(`Method ${req.method} Not Allowed`);
   }
-
-  return res.status(405).end(); // วิธีการอื่นๆ ไม่ได้รับอนุญาต
 }

@@ -1,15 +1,16 @@
 // src/app/models/Record.ts
 import mongoose, { Document, Schema } from 'mongoose';
 
-export interface IRecord extends Document {
-  title: string;
+export interface Record extends Document {
+  name: string;
   description: string;
 }
 
-const RecordSchema: Schema = new Schema({
-  title: { type: String, required: true },
+const recordSchema: Schema = new Schema({
+  name: { type: String, required: true },
   description: { type: String, required: true },
 });
 
-const Record = mongoose.model<IRecord>('Record', RecordSchema);
-export default Record;
+const RecordModel = mongoose.model<Record>('Record', recordSchema);
+
+export default RecordModel;

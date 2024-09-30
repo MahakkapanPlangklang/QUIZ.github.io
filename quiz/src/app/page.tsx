@@ -1,28 +1,29 @@
 // src/app/page.tsx
-'use client'; // ทำให้ไฟล์นี้เป็น Client Component
+"use client"; // ทำให้คอมโพเนนต์นี้เป็น Client Component
 import { useEffect, useState } from 'react';
-import connectDB from './db'; // เชื่อมต่อกับฐานข้อมูล
-import RecordForm from './components/RecordForm';
+import connectDB from './db'; // เชื่อมต่อ MongoDB
 import RecordList from './components/RecordList';
-import { Record as RecordType } from './types/Record'; // นำเข้า Record interface
+import RecordForm from './components/RecordForm';
 
-export default function Page() {
-  const [records, setRecords] = useState<RecordType[]>([]); // ใช้ RecordType ในการประกาศ state
+const Page = () => {
+  const [records, setRecords] = useState([]);
 
+  // ใช้ useEffect เพื่อเรียก connectDB และ fetchRecords
   useEffect(() => {
-    const initializeDB = async () => {
-      await connectDB(); // เชื่อมต่อกับฐานข้อมูล
-      fetchRecords(); // ดึงข้อมูลหลังจากเชื่อมต่อฐานข้อมูล
+    const initializeDatabase = async () => {
+      await connectDB(); // เรียกเชื่อมต่อกับฐานข้อมูล
+      await fetchRecords(); // เรียกฟังก์ชัน fetchRecords ที่คุณต้องสร้าง
     };
 
-    initializeDB();
+    initializeDatabase();
   }, []);
 
+  // ฟังก์ชันสำหรับดึงข้อมูลจากฐานข้อมูล
   const fetchRecords = async () => {
     try {
-      const response = await fetch('/api/records'); // ใช้ API เพื่อดึงข้อมูล
-      const data: RecordType[] = await response.json(); // ใช้ RecordType ในการกำหนดประเภทข้อมูล
-      setRecords(data); // อัปเดต state
+      const response = await fetch('/api'); // เปลี่ยน URL เป็น API ของคุณ
+      const data = await response.json();
+      setRecords(data); // ตั้งค่ารายการที่ดึงมาจากฐานข้อมูล
     } catch (error) {
       console.error('Error fetching records:', error);
     }
@@ -30,9 +31,11 @@ export default function Page() {
 
   return (
     <div>
-      <h1>Quiz Records</h1>
+      <h1>Record List</h1>
       <RecordForm fetchRecords={fetchRecords} />
       <RecordList records={records} />
     </div>
   );
-}
+};
+
+export default Page;
