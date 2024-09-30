@@ -1,4 +1,5 @@
 // src/app/page.tsx
+"use client"; // เพิ่มบรรทัดนี้เพื่อทำให้คอมโพเนนต์เป็น Client Component
 
 import React, { useEffect, useState } from 'react';
 import connectDB from './db'; // เชื่อมต่อ MongoDB
