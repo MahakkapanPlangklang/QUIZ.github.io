@@ -1,6 +1,6 @@
 "use client"; // ทำให้แน่ใจว่านี่เป็น Client Component
 
-import Image from "next/image";
+import Image from "next/image"; // นำเข้า Image
 import styles from "./page.module.css";
 import { useState } from "react";
 
@@ -43,6 +43,16 @@ export default function Home() {
                         <li key={index}>{`${record.date}: ${record.amount}`}</li>
                     ))}
                 </ul>
+
+                {/* แสดงภาพจาก next/image */}
+                <Image
+                    className={styles.logo}
+                    src="https://nextjs.org/icons/next.svg"
+                    alt="Next.js logo"
+                    width={180}
+                    height={38}
+                    priority
+                />
             </main>
         </div>
     );
