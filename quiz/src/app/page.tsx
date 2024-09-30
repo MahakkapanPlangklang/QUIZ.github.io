@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './page.module.css'; // นำเข้า CSS Module
 
 const ExpenseTracker: React.FC = () => {
@@ -9,6 +9,24 @@ const ExpenseTracker: React.FC = () => {
     const [type, setType] = useState<string>('รายรับ');
     const [note, setNote] = useState<string>('');
     const [records, setRecords] = useState<Array<{ amount: number; date: string; type: string; note: string }>>([]);
+
+    // ฟังก์ชันสำหรับดึงข้อมูลบันทึก
+    const fetchRecords = async () => {
+        try {
+            const response = await fetch('/api/expense');
+            if (!response.ok) {
+                throw new Error('เกิดข้อผิดพลาดในการดึงข้อมูล');
+            }
+            const data = await response.json();
+            setRecords(data.records); // สมมติว่าข้อมูลที่ส่งกลับมีฟิลด์ `records`
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    useEffect(() => {
+        fetchRecords(); // ดึงข้อมูลบันทึกเมื่อคอมโพเนนต์ถูกโหลด
+    }, []);
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
@@ -32,8 +50,8 @@ const ExpenseTracker: React.FC = () => {
                 const data = await response.json();
                 console.log(data.message); // แสดงข้อความที่ได้จาก API
     
-                setRecords((prevRecords) => [...prevRecords, newRecord]);
-                resetForm();
+                setRecords((prevRecords) => [...prevRecords, newRecord]); // เพิ่มบันทึกใหม่ในสถานะ
+                resetForm(); // รีเซ็ตฟอร์ม
             } catch (error) {
                 console.error(error);
             }
@@ -97,11 +115,15 @@ const ExpenseTracker: React.FC = () => {
 
             <div className={styles.records}>
                 <h2>บันทึก</h2>
-                {records.map((record, index) => (
-                    <p key={index} className={styles.record}>
-                        วันที่: {record.date}, จำนวน: {record.amount}, ประเภท: {record.type}, โน้ต: {record.note}
-                    </p>
-                ))}
+                {records.length === 0 ? (
+                    <p>ยังไม่มีบันทึก</p>
+                ) : (
+                    records.map((record, index) => (
+                        <p key={index} className={styles.record}>
+                            วันที่: {record.date}, จำนวน: {record.amount}, ประเภท: {record.type}, โน้ต: {record.note}
+                        </p>
+                    ))
+                )}
             </div>
         </div>
     );
