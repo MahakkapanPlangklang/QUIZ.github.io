@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styles from './page.module.css'; // นำเข้า CSS Module
 
 const ExpenseTracker: React.FC = () => {
@@ -10,53 +10,36 @@ const ExpenseTracker: React.FC = () => {
     const [note, setNote] = useState<string>('');
     const [records, setRecords] = useState<Array<{ amount: number; date: string; type: string; note: string }>>([]);
 
-    // ฟังก์ชันสำหรับดึงข้อมูลบันทึก
-    const fetchRecords = async () => {
-        try {
-            const response = await fetch('/api/expense');
-            if (!response.ok) {
-                throw new Error('เกิดข้อผิดพลาดในการดึงข้อมูล');
-            }
-            const data = await response.json();
-            setRecords(data.records); // สมมติว่าข้อมูลที่ส่งกลับมีฟิลด์ `records`
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    useEffect(() => {
-        fetchRecords(); // ดึงข้อมูลบันทึกเมื่อคอมโพเนนต์ถูกโหลด
-    }, []);
-
     const handleSubmit = async (event: React.FormEvent) => {
-        event.preventDefault();
-    
-        if (amount && date) {
-            const newRecord = { amount: Number(amount), date, type, note };
-    
-            try {
-                const response = await fetch('/api/expense', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(newRecord),
-                });
-    
-                if (!response.ok) {
-                    throw new Error('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
-                }
-    
-                const data = await response.json();
-                console.log(data.message); // แสดงข้อความที่ได้จาก API
-    
-                setRecords((prevRecords) => [...prevRecords, newRecord]); // เพิ่มบันทึกใหม่ในสถานะ
-                resetForm(); // รีเซ็ตฟอร์ม
-            } catch (error) {
-                console.error(error);
-            }
-        }
-    };
+      event.preventDefault();
+  
+      if (amount && date) {
+          const newRecord = { amount: Number(amount), date, type, note };
+  
+          try {
+              const response = await fetch('/api/expense', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify(newRecord),
+              });
+  
+              if (!response.ok) {
+                  throw new Error('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+              }
+  
+              const data = await response.json();
+              console.log(data.message); // แสดงข้อความที่ได้จาก API
+  
+              setRecords((prevRecords) => [...prevRecords, newRecord]);
+              resetForm();
+          } catch (error) {
+              console.error(error);
+          }
+      }
+  };
+
 
     const resetForm = () => {
         setAmount('');
@@ -65,11 +48,18 @@ const ExpenseTracker: React.FC = () => {
         setNote('');
     };
 
-    // ฟังก์ชันสำหรับคำนวณยอดรวม
-    const calculateTotal = () => {
-        return records.reduce((total, record) => {
-            return record.type === 'รายรับ' ? total + record.amount : total - record.amount;
-        }, 0);
+    // ฟังก์ชันคำนวณยอดรวมรายรับ
+    const getTotalIncome = () => {
+        return records
+            .filter((record) => record.type === 'รายรับ')
+            .reduce((total, record) => total + record.amount, 0);
+    };
+
+    // ฟังก์ชันคำนวณยอดรวมรายจ่าย
+    const getTotalExpense = () => {
+        return records
+            .filter((record) => record.type === 'รายจ่าย')
+            .reduce((total, record) => total + record.amount, 0);
     };
 
     return (
@@ -77,7 +67,7 @@ const ExpenseTracker: React.FC = () => {
             <h1 className={styles.title}>บันทึกรายรับรายจ่าย</h1>
             <form className={styles.form} onSubmit={handleSubmit}>
                 <FormField
-                    label="จำนวน:"
+                    label="จำนวนเงิน:"
                     type="number"
                     value={amount}
                     onChange={(e) => setAmount(Number(e.target.value))}
@@ -109,21 +99,20 @@ const ExpenseTracker: React.FC = () => {
                 <button className={styles.button} type="submit">บันทึก</button>
             </form>
 
-            <div className={styles.total}>
-                <h2>ยอดรวมปัจจุบัน: {calculateTotal()} บาท</h2>
+            <div className={styles.summary}>
+                <h2>สรุป</h2>
+                <p>ยอดรวมรายรับ: {getTotalIncome()} บาท</p>
+                <p>ยอดรวมรายจ่าย: {getTotalExpense()} บาท</p>
+                <p>ยอดสุทธิ: {getTotalIncome() - getTotalExpense()} บาท</p>
             </div>
 
             <div className={styles.records}>
                 <h2>บันทึก</h2>
-                {records.length === 0 ? (
-                    <p>ยังไม่มีบันทึก</p>
-                ) : (
-                    records.map((record, index) => (
-                        <p key={index} className={styles.record}>
-                            วันที่: {record.date}, จำนวน: {record.amount}, ประเภท: {record.type}, โน้ต: {record.note}
-                        </p>
-                    ))
-                )}
+                {records.map((record, index) => (
+                    <p key={index} className={styles.record}>
+                        วันที่: {record.date}, จำนวน: {record.amount}, ประเภท: {record.type}, โน้ต: {record.note}
+                    </p>
+                ))}
             </div>
         </div>
     );

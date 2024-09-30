@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import { MongoClient } from 'mongodb';
 
-const uri = 'mongodb+srv://0907656068:0907656068@cluster0.u1vf7.mongodb.net/'; // แทนที่ด้วย URL ของ MongoDB
+const uri = 'mongodb+srv://phanuwatsa:qhmC2yJWT3OjcMyz@phanuwat.kqdaq.mongodb.net/'; // แทนที่ด้วย URL ของ MongoDB
 const client = new MongoClient(uri);
 
 export async function POST(request: Request) {
@@ -12,8 +12,8 @@ export async function POST(request: Request) {
 
     try {
         await client.connect();
-        const database = client.db('Cluster0'); // แทนที่ด้วยชื่อฐานข้อมูลของคุณ
-        const collection = database.collection('Price_User'); // แทนที่ด้วยชื่อคอลเลคชันของคุณ
+        const database = client.db('total'); // แทนที่ด้วยชื่อฐานข้อมูลของคุณ
+        const collection = database.collection('total_price'); // แทนที่ด้วยชื่อคอลเลคชันของคุณ
 
         const newExpense = { amount, date, type, note };
         await collection.insertOne(newExpense);
