@@ -1,11 +1,9 @@
-// src/app/db.ts
 import mongoose from 'mongoose';
 
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || '', {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
+    await mongoose.connect(process.env.MONGODB_URI!, {
+      // ลบ useNewUrlParser และ useUnifiedTopology
     });
     console.log('MongoDB connected');
   } catch (error) {
