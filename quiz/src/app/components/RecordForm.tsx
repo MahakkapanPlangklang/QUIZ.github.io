@@ -1,33 +1,46 @@
+// src/app/components/RecordForm.tsx
 import React, { useState } from 'react';
-import axios from 'axios';
 
 const RecordForm: React.FC<{ fetchRecords: () => void }> = ({ fetchRecords }) => {
-  const [amount, setAmount] = useState<number>(0);
-  const [date, setDate] = useState<string>(new Date().toISOString().slice(0, 10));
-  const [type, setType] = useState<'income' | 'expense'>('income');
-  const [note, setNote] = useState<string>('');
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newRecord = { amount, date, type, note };
-    await axios.post('/api/records', newRecord);
-    fetchRecords(); // เรียกใช้ฟังก์ชันเพื่อดึงข้อมูลใหม่
-    setAmount(0);
-    setDate(new Date().toISOString().slice(0, 10));
-    setType('income');
-    setNote('');
+    
+    const response = await fetch('/api', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ title, description }),
+    });
+
+    if (response.ok) {
+      fetchRecords(); // เรียกใช้งานฟังก์ชัน fetchRecords เพื่อรีเฟรชข้อมูล
+      setTitle(''); // รีเซ็ตค่า title
+      setDescription(''); // รีเซ็ตค่า description
+    } else {
+      console.error('Error submitting form');
+    }
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <input type="number" value={amount} onChange={(e) => setAmount(Number(e.target.value))} required />
-      <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
-      <select value={type} onChange={(e) => setType(e.target.value as 'income' | 'expense')}>
-        <option value="income">รายรับ</option>
-        <option value="expense">รายจ่าย</option>
-      </select>
-      <input type="text" value={note} onChange={(e) => setNote(e.target.value)} placeholder="หมายเหตุ" />
-      <button type="submit">บันทึก</button>
+      <input
+        type="text"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        placeholder="Title"
+        required
+      />
+      <textarea
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        placeholder="Description"
+        required
+      />
+      <button type="submit">Add Record</button>
     </form>
   );
 };
