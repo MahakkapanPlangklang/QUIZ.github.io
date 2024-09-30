@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import styles from './page.module.css'; // นำเข้า CSS Module
+//import styles from './page.module.css'; // นำเข้า CSS Module
 
 const ExpenseTracker: React.FC = () => {
     const [amount, setAmount] = useState<number | ''>('');
