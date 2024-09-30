@@ -1,4 +1,3 @@
-// page.tsx
 "use client"; // ทำเครื่องหมายคอมโพเนนต์นี้เป็น Client Component
 
 import React, { useEffect, useState } from 'react';
@@ -18,12 +17,12 @@ const API_URL = 'https://quiz-flame-one.vercel.app/';
 
 const Page = () => {
     const [records, setRecords] = useState<Record[]>([]);
-    const [amount, setAmount] = useState('');
-    const [date, setDate] = useState('');
+    const [amount, setAmount] = useState<string>('');
+    const [date, setDate] = useState<string>('');
     const [type, setType] = useState<'income' | 'expense'>('income');
-    const [note, setNote] = useState('');
-    const [totalIncome, setTotalIncome] = useState(0);
-    const [totalExpense, setTotalExpense] = useState(0);
+    const [note, setNote] = useState<string>('');
+    const [totalIncome, setTotalIncome] = useState<number>(0);
+    const [totalExpense, setTotalExpense] = useState<number>(0);
 
     const saveRecord = async () => {
         try {
@@ -32,6 +31,7 @@ const Page = () => {
             fetchRecords();
         } catch (error) {
             console.error("Error saving record:", error);
+            alert("ไม่สามารถบันทึกข้อมูลได้");
         }
     };
 
@@ -43,6 +43,7 @@ const Page = () => {
             calculateTotals(recordsData);
         } catch (error) {
             console.error("Error fetching records:", error);
+            alert("ไม่สามารถดึงข้อมูลบันทึกได้");
         }
     };
 
@@ -89,9 +90,13 @@ const Page = () => {
 
             <h2>รายการบันทึก</h2>
             <ul>
-                {records.map(record => (
-                    <li key={record.id}>{`${record.date} - ${record.type === 'income' ? 'รายรับ' : 'รายจ่าย'}: ${record.amount} (${record.note})`}</li>
-                ))}
+                {records.length > 0 ? (
+                    records.map(record => (
+                        <li key={record.id}>{`${record.date} - ${record.type === 'income' ? 'รายรับ' : 'รายจ่าย'}: ${record.amount} (${record.note})`}</li>
+                    ))
+                ) : (
+                    <li>ยังไม่มีรายการบันทึก</li>
+                )}
             </ul>
 
             <h3>รวมรายรับ: {totalIncome} | รวมรายจ่าย: {totalExpense}</h3>
