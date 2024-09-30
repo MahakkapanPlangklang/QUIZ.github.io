@@ -1,46 +1,130 @@
-// src/app/page.tsx
-"use client"; // เพิ่มบรรทัดนี้เพื่อทำให้คอมโพเนนต์เป็น Client Component
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import connectDB from './db'; // เชื่อมต่อ MongoDB
-import RecordForm from './components/RecordForm'; // นำเข้า RecordForm
-import RecordList from './components/RecordList'; // นำเข้า RecordList
-import { Record } from './types/Record'; // นำเข้า Type สำหรับ Record
+import React, { useState } from 'react';
+import styles from './page.module.css'; // นำเข้า CSS Module
 
-const Page: React.FC = () => {
-  const [records, setRecords] = useState<Record[]>([]);
-  const [totalIncome, setTotalIncome] = useState<number>(0);
-  const [totalExpense, setTotalExpense] = useState<number>(0);
+const ExpenseTracker: React.FC = () => {
+    const [amount, setAmount] = useState<number | ''>('');
+    const [date, setDate] = useState<string>('');
+    const [type, setType] = useState<string>('รายรับ');
+    const [note, setNote] = useState<string>('');
+    const [records, setRecords] = useState<Array<{ amount: number; date: string; type: string; note: string }>>([]);
 
-  useEffect(() => {
-    connectDB(); // เชื่อมต่อฐานข้อมูล
-    fetchRecords(); // ดึงข้อมูลรายรับรายจ่ายเมื่อ component ถูก mount
-  }, []);
+    const handleSubmit = async (event: React.FormEvent) => {
+        event.preventDefault();
+    
+        if (amount && date) {
+            const newRecord = { amount: Number(amount), date, type, note };
+    
+            try {
+                const response = await fetch('/api/expense', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(newRecord),
+                });
+    
+                if (!response.ok) {
+                    throw new Error('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+                }
+    
+                const data = await response.json();
+                console.log(data.message); // แสดงข้อความที่ได้จาก API
+    
+                setRecords((prevRecords) => [...prevRecords, newRecord]);
+                resetForm();
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    };
 
-  const fetchRecords = async () => {
-    // ฟังก์ชันสำหรับดึงข้อมูลจากฐานข้อมูล
-    const response = await fetch('/api/records');
-    const data = await response.json();
-    setRecords(data);
-    calculateTotals(data); // คำนวณยอดรวม
-  };
+    const resetForm = () => {
+        setAmount('');
+        setDate('');
+        setType('รายรับ');
+        setNote('');
+    };
 
-  const calculateTotals = (data: Record[]) => {
-    const income = data.filter(record => record.type === 'income').reduce((acc, record) => acc + record.amount, 0);
-    const expense = data.filter(record => record.type === 'expense').reduce((acc, record) => acc + record.amount, 0);
-    setTotalIncome(income);
-    setTotalExpense(expense);
-  };
+    // ฟังก์ชันสำหรับคำนวณยอดรวม
+    const calculateTotal = () => {
+        return records.reduce((total, record) => {
+            return record.type === 'รายรับ' ? total + record.amount : total - record.amount;
+        }, 0);
+    };
 
-  return (
-    <div>
-      <h1>บันทึกรายรับรายจ่าย</h1>
-      <RecordForm fetchRecords={fetchRecords} />
-      <h2>ยอดรวมรายรับ: {totalIncome} บาท</h2>
-      <h2>ยอดรวมรายจ่าย: {totalExpense} บาท</h2>
-      <RecordList records={records} />
-    </div>
-  );
+    return (
+        <div className={styles.container}>
+            <h1 className={styles.title}>บันทึกรายรับรายจ่าย</h1>
+            <form className={styles.form} onSubmit={handleSubmit}>
+                <FormField
+                    label="จำนวน:"
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(Number(e.target.value))}
+                    required
+                />
+                <FormField
+                    label="วันที่:"
+                    type="date"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                    required
+                />
+                <label className={styles.label}>
+                    ประเภท:
+                    <select className={styles.select} value={type} onChange={(e) => setType(e.target.value)} required>
+                        <option value="รายรับ">รายรับ</option>
+                        <option value="รายจ่าย">รายจ่าย</option>
+                    </select>
+                </label>
+                <label className={styles.label}>
+                    โน้ต:
+                    <textarea
+                        className={styles.textarea}
+                        value={note}
+                        onChange={(e) => setNote(e.target.value)}
+                        rows={4}
+                    />
+                </label>
+                <button className={styles.button} type="submit">บันทึก</button>
+            </form>
+
+            <div className={styles.total}>
+                <h2>ยอดรวมปัจจุบัน: {calculateTotal()} บาท</h2>
+            </div>
+
+            <div className={styles.records}>
+                <h2>บันทึก</h2>
+                {records.map((record, index) => (
+                    <p key={index} className={styles.record}>
+                        วันที่: {record.date}, จำนวน: {record.amount}, ประเภท: {record.type}, โน้ต: {record.note}
+                    </p>
+                ))}
+            </div>
+        </div>
+    );
 };
 
-export default Page;
+// คอมโพเนนต์ย่อยสำหรับฟอร์มฟิลด์
+const FormField: React.FC<{
+    label: string;
+    type: string;
+    value: string | number;
+    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+    required?: boolean;
+}> = ({ label, type, value, onChange, required }) => (
+    <label className={styles.label}>
+        {label}
+        <input
+            className={styles.input}
+            type={type}
+            value={value}
+            onChange={onChange}
+            required={required}
+        />
+    </label>
+);
+
+export default ExpenseTracker;
