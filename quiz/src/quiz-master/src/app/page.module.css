@@ -3,9 +3,9 @@
     max-width: 600px;
     margin: 40px auto; /* เพิ่ม margin-top ให้กล่องมีพื้นที่มากขึ้น */
     padding: 30px;
-    background-color: #f9f9f9; /* เปลี่ยนสีพื้นหลังให้สว่างขึ้น */
+    background-color: #ffffff; /* เปลี่ยนพื้นหลังให้ดูสว่างสะอาดตา */
     border-radius: 12px; /* เพิ่มความโค้งมน */
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); /* ปรับขนาดเงาให้ลึกขึ้นเล็กน้อย */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); /* ปรับขนาดเงาให้ลึกขึ้นเล็กน้อย */
     transition: transform 0.3s ease; /* เพิ่มเอฟเฟกต์เมื่อ hover */
 }
 
@@ -15,8 +15,8 @@
 
 .title {
     text-align: center;
-    color: #4A4A4A; /* ใช้สีที่เข้มขึ้นแต่ดูทันสมัย */
-    font-size: 30px; /* ขยายขนาดฟอนต์ */
+    color: #2c3e50; /* ใช้สีที่เข้มขึ้นแต่ดูทันสมัย */
+    font-size: 28px;
     font-weight: bold;
     margin-bottom: 20px;
 }
@@ -29,31 +29,31 @@
     display: block;
     margin: 15px 0 5px;
     font-weight: 600;
-    color: #555; /* สีที่เข้มขึ้นเล็กน้อย */
+    color: #34495e;
     font-size: 16px;
 }
 
 .input, .select, .textarea {
     width: 100%;
-    padding: 14px; /* เพิ่ม padding ให้มากขึ้นเพื่อให้ดูทันสมัย */
+    padding: 12px; /* เพิ่ม padding ให้มากขึ้นเพื่อให้ดูทันสมัย */
     margin-bottom: 15px; /* เพิ่มพื้นที่ระหว่างฟิลด์ */
-    border: 1px solid #ddd; /* เปลี่ยนสีขอบให้สว่างขึ้น */
+    border: 1px solid #ccc;
     border-radius: 8px; /* เพิ่มความโค้งมน */
     font-size: 16px; /* ปรับขนาดฟอนต์ให้ดูอ่านง่าย */
-    background-color: #ffffff; /* สีพื้นหลังของ input */
+    background-color: #fff;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .input:focus, .select:focus, .textarea:focus {
-    border-color: #2196F3; /* เปลี่ยนสีเมื่อโฟกัส */
+    border-color: #4CAF50;
     outline: none;
-    box-shadow: 0 0 5px rgba(33, 150, 243, 0.2); /* เพิ่มเงาเมื่อโฟกัส */
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.2); /* เพิ่มเงาเมื่อโฟกัส */
 }
 
 .button {
     width: 100%;
     padding: 12px;
-    background-color: #2196F3; /* เปลี่ยนสีปุ่ม */
+    background-color: #4CAF50;
     color: white;
     border: none;
     border-radius: 8px; /* เพิ่มความโค้งมน */
@@ -64,7 +64,7 @@
 }
 
 .button:hover {
-    background-color: #1e88e5; /* เปลี่ยนสีเมื่อ hover */
+    background-color: #45a049;
     transform: translateY(-2px); /* เพิ่มเอฟเฟกต์ยกตัว */
 }
 
@@ -73,7 +73,7 @@
 }
 
 .record {
-    background-color: #e3f2fd; /* สีพื้นหลังของรายการ */
+    background-color: #e3f2fd;
     border-left: 6px solid #2196F3; /* ปรับให้หนาขึ้นเล็กน้อย */
     padding: 15px; /* เพิ่ม padding */
     margin: 15px 0; /* เพิ่มระยะห่าง */
